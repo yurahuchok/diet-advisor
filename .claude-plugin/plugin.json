@@ -1,0 +1,10 @@
+{
+  "name": "diet-advisor",
+  "description": "Track daily food intake against personalized calorie and macro targets, with its own memory separate from Claude's general memory",
+  "version": "1.0.0",
+  "author": {
+    "name": "Yuri Huchok"
+  },
+  "license": "MIT",
+  "keywords": ["diet", "nutrition", "calories", "macros", "tracking"]
+}
