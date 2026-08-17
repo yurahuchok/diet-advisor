@@ -1,0 +1,10 @@
+{
+  "name": "diet-advisor-web",
+  "description": "Diet Advisor for claude.ai and Claude Desktop chat — tracks daily intake against personalized calorie and macro targets, storing data in Claude memory",
+  "version": "1.0.0",
+  "author": {
+    "name": "Yuri Huchok"
+  },
+  "license": "MIT",
+  "keywords": ["diet", "nutrition", "calories", "macros", "tracking"]
+}
