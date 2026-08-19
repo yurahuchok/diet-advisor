@@ -1,13 +1,13 @@
 {
-  "name": "diet-advisor",
+  "name": "calorie-tracker",
   "owner": {
     "name": "Yuri Huchok"
   },
   "plugins": [
     {
-      "name": "diet-advisor",
+      "name": "calorie-tracker",
       "source": "./",
-      "description": "Track daily food intake against personalized calorie and macro targets, kept in a portable data block stored in Claude memory."
+      "description": "Strictly arithmetic calorie and macro tracker: log dishes and count intake against numeric targets, kept in a portable data block."
     }
   ]
 }

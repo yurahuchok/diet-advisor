@@ -1,11 +1,11 @@
 {
-  "name": "diet-advisor",
+  "name": "calorie-tracker",
   "interface": {
-    "displayName": "Diet Advisor"
+    "displayName": "Calorie Tracker"
   },
   "plugins": [
     {
-      "name": "diet-advisor",
+      "name": "calorie-tracker",
       "source": {
         "source": "local",
         "path": "./"

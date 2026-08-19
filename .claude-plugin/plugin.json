@@ -1,10 +1,10 @@
 {
-  "name": "diet-advisor",
-  "description": "Track daily food intake against personalized calorie and macro targets, kept in a portable data block stored in Claude memory",
-  "version": "1.0.0",
+  "name": "calorie-tracker",
+  "description": "Strictly arithmetic calorie and macro tracker: log dishes and count intake against numeric targets, kept in a portable data block",
+  "version": "2.0.0",
   "author": {
     "name": "Yuri Huchok"
   },
   "license": "MIT",
-  "keywords": ["diet", "nutrition", "calories", "macros", "tracking"]
+  "keywords": ["calories", "macros", "tracking", "food log"]
 }
