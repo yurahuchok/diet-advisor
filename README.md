@@ -1,48 +1,31 @@
 # Diet Advisor
 
-A Claude Code skill that tracks daily food intake against personalized calorie and macro targets, with its own memory separate from Claude's general memory.
+A Claude skill for claude.ai and Claude Desktop chat that tracks daily food intake against personalized calorie and macro targets, storing data in a dedicated Diet Advisor section of Claude memory (claude.ai has no persistent filesystem).
 
 ## Layout
 
 ```
-.claude-plugin/plugin.json       # diet-advisor plugin manifest (Claude Code)
-.claude-plugin/marketplace.json  # Marketplace serving both plugins in this repo
-skills/diet-advisor/SKILL.md     # Core skill: file-based storage, formulas, command workflows
-commands/diet-*.md               # 8 slash-command wrappers
-diet-advisor-web/                # diet-advisor-web plugin (claude.ai / Claude Desktop chat)
-  .claude-plugin/plugin.json
-  skills/diet-advisor/SKILL.md   # Same tracker, data stored in Claude memory
+.claude-plugin/plugin.json       # diet-advisor plugin manifest
+.claude-plugin/marketplace.json  # Marketplace serving the plugin
+skills/diet-advisor/SKILL.md     # Core skill: memory layout, formulas, workflows
 ```
 
 ## Install
 
-This repo is a plugin marketplace serving two variants of the same tracker — install the one matching where you use Claude.
+Requires a plan with plugin support (Pro/Max/Team/Enterprise): Customize → Plugins → "+" → Add marketplace from GitHub → this repo's URL → install `diet-advisor`.
 
-**Claude Code** (`diet-advisor` — file-based storage, slash commands):
+On the Free plan (no plugin support), zip the `skills/diet-advisor` folder and upload it manually via Settings → Skills instead (requires code execution enabled).
 
-```
-/plugin marketplace add /path/to/diet-advisor   # or owner/repo once on GitHub
-/plugin install diet-advisor@diet-advisor
-```
+## Usage
 
-Commands are namespaced: `/diet-advisor:diet-add`, `/diet-advisor:diet-summary`, etc.
+The skill is conversational — just ask:
 
-**claude.ai / Claude Desktop chat** (`diet-advisor-web` — Claude-memory storage, conversational; Pro/Max/Team/Enterprise): Customize → Plugins → "+" → Add marketplace from GitHub → this repo's URL → install `diet-advisor-web`. On the Free plan (no plugin support), zip the `diet-advisor-web/skills/diet-advisor` folder and upload it manually via Settings → Skills instead (requires code execution enabled).
-
-Diet data stays out of Claude's general memory in the Claude Code variant (`~/.claude/diet-advisor/`: `profile.json` + `days/YYYY-MM-DD.json`); the web variant stores it in a dedicated Diet Advisor section of Claude memory, since claude.ai has no persistent filesystem.
-
-## Commands
-
-| Command | Purpose |
-|---|---|
-| `/diet-init` | One-by-one setup questions → maintenance intake → goal → daily targets |
-| `/diet-fix` | Fix any stored value; recalculates downstream numbers |
-| `/diet-start` | Start a new diet day (optionally logging the first dish) |
-| `/diet-add <dish>` | Log a dish; shows day totals, remaining, and rebalancing suggestions |
-| `/diet-remove <dish>` | Remove a mistakenly logged dish; recalculates |
-| `/diet-summary` | Today's intake table, remaining macros, suggestions |
-| `/diet-mb <dish>` | "Maybe" — preview a dish's impact without logging it |
-| `/diet-ask <question>` | Nutrition Q&A in the context of your data; asks before saving anything |
+- Set up or fix your diet profile (stats → maintenance intake → goal → daily targets)
+- Start a new diet day
+- Log a dish, or remove a mistakenly logged one
+- Preview a dish's impact without logging it ("maybe")
+- Show today's intake, remaining macros, and suggestions
+- Ask nutrition questions in the context of your data
 
 ## Method
 

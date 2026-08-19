@@ -1,52 +1,42 @@
 ---
 name: diet-advisor
-description: Use when the user runs any /diet-* command (diet-init, diet-fix, diet-start, diet-add, diet-remove, diet-summary, diet-mb, diet-ask) or asks to track calories, protein, fat, or carbs, log a meal or dish, or calculate daily intake targets.
+description: Use when the user wants to track calories or macros, log or preview a meal, set up or fix a diet profile, review today's intake, or ask nutrition questions in the context of their diet data.
 ---
 
 # Diet Advisor
 
 Tracks daily food intake against personalized calorie and macro targets calculated from the user's stats and goal.
 
+Built for claude.ai and Claude Desktop chat: there is no filesystem that persists between conversations, so all Diet Advisor data lives in Claude's memory, in one clearly labeled section.
+
 ## Memory
 
-All Diet Advisor data lives in its own store at `~/.claude/diet-advisor/` — never in Claude's general memory, CLAUDE.md, or the project:
+Keep all Diet Advisor data in a single **Diet Advisor** memory section, structured exactly like this:
 
 ```
-~/.claude/diet-advisor/
-  profile.json          # stats, maintenance numbers, goal, daily targets
-  days/YYYY-MM-DD.json  # one file per tracked day
-```
-
-- Get today's date with `date +%F`. Commands operate on today's file; if the user supplies a date (YYYY-MM-DD), use that day instead.
-- Run `mkdir -p ~/.claude/diet-advisor/days` before the first write.
-- If `profile.json` is missing and the command is not diet-init, stop and tell the user to run `/diet-init` first.
-- Day totals are always computed by summing entries at read time — never stored.
-
-`profile.json`:
-
-```json
-{
-  "updated": "2026-08-17",
+DIET ADVISOR DATA
+profile: {"updated": "2026-08-17",
   "sex": "male", "age": 30, "weight_kg": 80.0, "height_cm": 180,
   "gym_sessions_per_week": 4, "activity_multiplier": 1.55,
   "bmr": 1780,
   "maintenance": {"calories": 2760, "protein_g": 144, "fat_g": 77, "carbs_g": 373},
   "goal": "fat_loss",
-  "targets": {"calories": 2210, "protein_g": 176, "fat_g": 61, "carbs_g": 239}
-}
+  "targets": {"calories": 2210, "protein_g": 176, "fat_g": 61, "carbs_g": 239}}
+today: {"date": "2026-08-17", "entries": [
+  {"id": 1, "dish": "Oatmeal with banana", "portion": "80 g oats, 1 medium banana",
+   "calories": 420, "protein_g": 12, "fat_g": 7, "carbs_g": 82}]}
+history:
+  2026-08-16: 2180 kcal / 170 P / 58 F / 240 C (target 2210/176/61/239)
 ```
 
-`days/2026-08-17.json`:
+Rules:
 
-```json
-{
-  "date": "2026-08-17",
-  "entries": [
-    {"id": 1, "dish": "Oatmeal with banana", "portion": "80 g oats, 1 medium banana",
-     "calories": 420, "protein_g": 12, "fat_g": 7, "carbs_g": 82}
-  ]
-}
-```
+- Read this memory section before answering any diet request. If there is no profile, stop and offer to set one up first.
+- After every change (setup, fix, log, remove, new day), update the memory section immediately. Memory is the only store — anything not written there is lost when the conversation ends.
+- Use today's date from the conversation context. If the stored `today` date is in the past, first compress that day into a one-line history summary (date + total kcal/P/F/C vs target), then start a fresh `today`.
+- `today` keeps full entries with ids so a single dish can be removed; `history` keeps totals only. Keep at most 14 history lines, dropping the oldest.
+- Day totals for `today` are always computed by summing entries at read time — never stored.
+- Never store diet data outside this section, and never mix general memories into it.
 
 ## Calculations
 
@@ -74,41 +64,44 @@ Use general nutrition knowledge. If the portion is unstated or ambiguous (e.g., 
 
 ## Status report
 
-End diet-add, diet-remove, diet-summary, and diet-mb with:
+End the log, remove, summary, and preview workflows with:
 
 1. A table: for each of calories, protein, fat, carbs → consumed, target, remaining. Flag negative remaining as over target.
 2. One short rebalancing suggestion: which macros lag or exceed, plus 2–3 concrete foods that close the gap within the remaining calories (e.g., protein lagging with calories to spare → chicken breast, greek yogurt, egg whites; carbs lagging → rice, fruit, oats; fat lagging → nuts, olive oil, avocado, salmon).
 
-## Commands
+## Workflows
 
-### diet-init
-Ask one question at a time (use AskUserQuestion when available): biological sex (needed for the BMR formula), age, weight, height, gym sessions/week. Then compute BMR → maintenance calories → maintenance macros, save to `profile.json`, show the results, and ask if anything needs fixing. Then ask the goal (fat loss / muscle gain / fat loss + muscle gain / strict maintenance), compute goal targets, save, show them, and again ask if anything needs fixing. If `profile.json` already exists, warn before overwriting.
+There are no slash commands on claude.ai — match the user's request to a workflow below.
 
-### diet-fix
+### Setup — "set up my diet", "calculate my targets"
+Ask one question at a time: biological sex (needed for the BMR formula), age, weight, height, gym sessions/week. Then compute BMR → maintenance calories → maintenance macros, save to memory, show the results, and ask if anything needs fixing. Then ask the goal (fat loss / muscle gain / fat loss + muscle gain / strict maintenance), compute goal targets, save, show them, and again ask if anything needs fixing. If a profile already exists in memory, warn before overwriting.
+
+### Fix — the user corrects a stat, goal, or target
 Show the current profile values, apply the requested change(s). If any stat or the goal changed, recalculate BMR, maintenance, and targets, save, and show before → after so the user sees what the recalculation changed.
 
-### diet-start
-Create today's day file with empty entries. If it already exists with entries, ask before resetting it. If a dish is included with the command, immediately run the diet-add workflow on it; otherwise tell the user to add the first dish with `/diet-add`.
+### New day — "start a new day", "starting fresh today"
+Summarize any previous `today` into history, then create today with empty entries. If today already exists with entries, ask before resetting it. If a dish is mentioned in the same request, immediately run the log workflow on it; otherwise invite the user to log their first dish.
 
-### diet-add
-Ensure today's file exists (create it silently if not). Estimate the dish, append an entry with the next id, save, then show the dish's numbers followed by the status report.
+### Log a dish — "I ate…", "log…", "add…"
+Ensure today exists in memory (create it silently if not). Estimate the dish, append an entry with the next id, save, then show the dish's numbers followed by the status report.
 
-### diet-remove
+### Remove a dish — "remove…", "I didn't eat…"
 Show today's entries with ids if the target is ambiguous; remove the requested entry; save; status report. If the day has no entries, say so.
 
-### diet-summary
+### Summary — "how am I doing today?", "show my intake"
 Show a table of today's entries (id, dish, kcal/P/F/C), then the status report.
 
-### diet-mb ("maybe")
-Estimate the dish and show its numbers but do NOT save anything. Show a hypothetical status report ("If you eat this: …") — what the totals would be and what would remain. End by noting the dish was not logged and can be added with `/diet-add`.
+### Preview ("maybe") — "what if I eat…", "should I eat…", "check this dish"
+Estimate the dish and show its numbers but do NOT save anything. Show a hypothetical status report ("If you eat this: …") — what the totals would be and what would remain. End by noting the dish was not logged and offering to log it.
 
-### diet-ask
-Answer the diet/nutrition question from general knowledge, using the profile and today's log as context. Never write to memory silently: if the answer implies changing stored data (stats, goal, targets, entries), propose the exact change and ask first. On approval, update, recalculate anything downstream, and show the result.
+### Diet question — any other nutrition question
+Answer from general knowledge, using the profile and today's log as context. Never write to memory silently: if the answer implies changing stored data (stats, goal, targets, entries), propose the exact change and ask first. On approval, update, recalculate anything downstream, and show the result.
 
 ## Common mistakes
 
-- Writing diet data anywhere except `~/.claude/diet-advisor/` — it must stay separate from general memory.
-- Storing computed totals in the day file — always sum entries at read time.
+- Answering from an earlier in-conversation copy of the data instead of the memory section, or changing data without immediately writing memory — memory is the only store.
+- Writing diet data outside the Diet Advisor memory section, or letting general memories leak into it.
+- Storing computed totals for today — always sum entries at read time (history lines are the one exception: totals only).
 - Changing weight or goal without recalculating maintenance and targets.
-- Logging a dish during diet-mb — mb never writes.
+- Logging a dish during a preview — preview never writes.
 - Guessing a portion silently — always state the assumed portion.

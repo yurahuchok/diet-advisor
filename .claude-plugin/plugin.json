@@ -1,6 +1,6 @@
 {
   "name": "diet-advisor",
-  "description": "Track daily food intake against personalized calorie and macro targets, with its own memory separate from Claude's general memory",
+  "description": "Diet Advisor for claude.ai and Claude Desktop chat — tracks daily intake against personalized calorie and macro targets, storing data in Claude memory",
   "version": "1.0.0",
   "author": {
     "name": "Yuri Huchok"

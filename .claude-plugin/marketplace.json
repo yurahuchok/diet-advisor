@@ -7,12 +7,7 @@
     {
       "name": "diet-advisor",
       "source": "./",
-      "description": "For Claude Code: file-based tracking with /diet-* slash commands. Track daily food intake against personalized calorie and macro targets."
-    },
-    {
-      "name": "diet-advisor-web",
-      "source": "./diet-advisor-web",
-      "description": "For claude.ai and Claude Desktop chat: same tracker with data stored in Claude memory. Install this one if you use Claude in the browser or apps, not Claude Code."
+      "description": "Track daily food intake against personalized calorie and macro targets, with data stored in Claude memory. For claude.ai and Claude Desktop chat."
     }
   ]
 }
