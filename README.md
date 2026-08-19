@@ -31,6 +31,7 @@ The skill is conversational — just ask:
 - Log a dish, or remove a mistakenly logged one
 - Preview a dish's impact without logging it ("maybe")
 - Show today's intake, remaining macros, and suggestions
+- Look back at the last 3 days ("what did I have for breakfast yesterday?"; older days are dropped by design)
 - Ask nutrition questions in the context of your data
 
 ## Method
