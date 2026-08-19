@@ -151,6 +151,12 @@ Answer from stored days — and the same meal-matching applies to questions abou
 ### Preview ("maybe") — "what if I eat [dish]…", "should I eat [a specific dish]…", "check this dish"
 Estimate the dish (library reuse allowed, but write nothing — no `last_eaten` refresh) and show its numbers. Show a hypothetical status report ("If you eat this: …") — what the totals would be and what would remain. End by noting the dish was not logged and offering to log it (which would use these exact numbers).
 
+### Reset — "delete all my diet data", "forget everything", "wipe diet advisor"
+Ask exactly one confirmation, stating the full scope: profile, today's log, history, and the dish library will be permanently deleted. No other questions, no partial-deletion counteroffers, no talking the user out of it; an explicit confirmation already in the same message ("delete everything, yes I'm sure") counts, and the propose-and-confirm rule is satisfied by this single confirmation. On confirmation:
+- **Memory mode**: delete the entire Diet Advisor memory section — the whole block, including `mode` — plus any other Diet Advisor remnants visible in memory. Note honestly that platform-level auto-memories outside your control may persist and where the user can clear those.
+- **Data-block mode**: nothing is stored on the assistant's side — say so, stop using and printing the block for the rest of the conversation, and remind the user to delete any saved block copies they carry (pinned notes, files).
+Then confirm completion. The skill is back to the no-profile state: the next diet request gets the setup offer.
+
 ### Diet question — any other nutrition question
 Answer using the profile and today's log as context. Questions about the skill's own numbers ("why is my protein so high?") are answered from the pinned Calculations reasoning and sources, not from conflicting general knowledge. Requests to see or clear the dish library are honored here — clearing requires explicit confirmation. Never update the block silently: if the answer implies changing stored data (stats, goal, targets, entries, dishes), propose the exact change and ask first. On approval, apply stat, goal, or target changes via the Fix workflow (including its manual-override rules); apply entry or dish changes via the Correct workflow; then show the result.
 
@@ -167,6 +173,7 @@ Answer using the profile and today's log as context. Questions about the skill's
 - Changing weight or goal without recalculating maintenance and targets — or recalculating over `"manual_targets": true` without asking.
 - Deviating from the pinned equations, constants, rounding, or reasoning in Calculations — the method is set in stone — or presenting setup numbers without the brief citation.
 - Skipping a Safety limit because the user insists — the limits override user confirmation except where they explicitly allow a confirmed override.
+- Wiping data without the single confirmation — or stalling a confirmed Reset with extra questions, partial offers, or persuasion.
 - Logging a dish during a preview — preview never writes.
 - Guessing a portion silently — always state the assumed portion.
 - Asking the user about time, or announcing time inferences while logging — `time` is determined invisibly from wording and context.

@@ -33,6 +33,7 @@ The skill is conversational — just ask:
 - Show today's intake, remaining macros, and suggestions
 - Look back at the 3 most recently logged days ("what did I have for breakfast yesterday?"; older days are dropped by design)
 - Ask nutrition questions in the context of your data
+- Wipe all Diet Advisor data ("delete everything") — one confirmation, then gone
 
 Safety: the skill declines to set up tracking for minors, during pregnancy/breastfeeding, or for underweight cutting, and warns on very low calorie targets — those cases are referred to a professional.
 
