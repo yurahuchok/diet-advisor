@@ -13,6 +13,9 @@
     "shortDescription": "Calorie and macro tracking with personalized targets",
     "longDescription": "Sets up a diet profile from your stats and goal, computes daily calorie and macro targets from published sources (Mifflin-St Jeor, ISSN position stands), then tracks every dish you log against them — with previews, corrections, history, and a reusable dish library. All data lives in one portable data block you can carry between assistants.",
     "developerName": "Yuri Huchok",
+    "brandColor": "#0E8A54",
+    "composerIcon": "./assets/icon.png",
+    "logo": "./assets/logo.png",
     "defaultPrompt": [
       "Use Diet Advisor to set up my diet profile and calculate my daily targets.",
       "Use Diet Advisor to log a chicken rice bowl for lunch.",

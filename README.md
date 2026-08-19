@@ -11,6 +11,7 @@ skills/diet-advisor/SKILL.md     # The skill: storage modes, formulas, workflows
 .claude-plugin/plugin.json       # Claude plugin manifest
 .claude-plugin/marketplace.json  # Claude marketplace serving the plugin
 .codex-plugin/plugin.json        # OpenAI (ChatGPT / Codex) plugin manifest
+assets/icon.png, assets/logo.png # Square plugin icon/logo (required by the OpenAI directory)
 .agents/plugins/marketplace.json # Repo marketplace serving the plugin to ChatGPT / Codex
 ```
 
