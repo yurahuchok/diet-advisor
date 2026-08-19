@@ -58,21 +58,25 @@ Rules (both modes):
 
 ## Calculations
 
-Round calories to the nearest 10 and grams to whole numbers (.5 rounds up); each step uses the already-rounded outputs of previous steps. Always present numbers as **kcal / protein g / fat g / carbs g**.
+The complete method is specified below and set in stone: use exactly these equations, constants, and reasoning. Never substitute alternatives you may know, even better-seeming ones. Where a source gives a range, the specific value this skill picks inside it is fixed too. Cite the sources briefly when presenting setup results (the Setup workflow shows how).
 
-1. **BMR** (Mifflin-St Jeor): `10·weight_kg + 6.25·height_cm − 5·age + 5` for male, `− 161` instead of `+ 5` for female. If the user prefers not to say, average both results.
-2. **Activity multiplier** from gym sessions/week: `0 → 1.2 · 1–2 → 1.375 · 3–4 → 1.55 · 5–6 → 1.725 · 7+ → 1.9`
-3. **Maintenance calories** = BMR × activity multiplier.
-4. **Goal targets**:
+Round calories to the nearest 10 and grams to whole numbers (.5 rounds up); each step uses the already-rounded outputs of previous steps. Calorie factors: 4 kcal/g protein, 4 kcal/g carbs, 9 kcal/g fat. Always present numbers as **kcal / protein g / fat g / carbs g**.
 
-| Goal | Calories | Protein |
-|---|---|---|
-| fat_loss | maintenance × 0.80 | 2.2 g/kg |
-| muscle_gain | maintenance × 1.10 | 2.0 g/kg |
-| recomp (fat loss + muscle gain) | maintenance × 0.90 | 2.2 g/kg |
-| maintenance | maintenance × 1.00 | 1.8 g/kg |
+1. **BMR** — Mifflin-St Jeor equation (Mifflin et al., 1990), rated most accurate for healthy adults by the Academy of Nutrition and Dietetics: it predicted within 10% of measured resting metabolic rate more often than any competing equation, with the narrowest error range.
+   `BMR = 10·weight_kg + 6.25·height_cm − 5·age + 5` for male; same with `− 161` in place of `+ 5` for female. If the user prefers not to say, compute both and average (skill convention — the equations differ only in the final constant).
 
-5. **Fat** = 25% of target calories ÷ 9, rounded to whole grams. **Carbs** = (target calories − 4·protein − 9·fat) ÷ 4, using the already-rounded protein and fat grams, then rounded to whole grams. Maintenance macros use the same fat/carb split with 1.8 g/kg protein.
+2. **Maintenance calories (TDEE)** = BMR × activity factor, on the standard 1.2–1.9 clinical scale: sedentary 1.2, light activity 1.375, moderate 1.55, hard 1.725, very hard 1.9. This skill's fixed mapping from gym sessions/week: `0 → 1.2 · 1–2 → 1.375 · 3–4 → 1.55 · 5–6 → 1.725 · 7+ → 1.9`.
+
+3. **Goal targets** — calorie adjustments per the ISSN Position Stand on Diets and Body Composition (Aragon et al., 2017): moderate deficits (~20%, pacing loss at roughly 0.5–1% of bodyweight per week) retain lean mass better than aggressive cuts, and muscle gain warrants only a small surplus (~10%) because larger surpluses mostly add fat. Protein per the ISSN Position Stand on Protein and Exercise (Jäger et al., 2017): 1.4–2.0 g/kg/day for exercising individuals, pushed to the top of that range or above while in a deficit to protect lean mass.
+
+| Goal | Calories | Protein | Reasoning |
+|---|---|---|---|
+| fat_loss | maintenance × 0.80 | 2.2 g/kg | moderate deficit; protein above 2.0 to protect lean mass while cutting |
+| muscle_gain | maintenance × 1.10 | 2.0 g/kg | small surplus; protein at the top of the general range |
+| recomp (fat loss + muscle gain) | maintenance × 0.90 | 2.2 g/kg | mild deficit, so deficit-level protein |
+| maintenance | maintenance × 1.00 | 1.8 g/kg | upper-middle of the general range |
+
+4. **Fat** = 25% of target calories ÷ 9, rounded to whole grams — 25% is the midpoint of the Institute of Medicine / Dietary Guidelines Acceptable Macronutrient Distribution Range of 20–35% of calories from fat. **Carbs** = (target calories − 4·protein − 9·fat) ÷ 4, using the already-rounded protein and fat grams, then rounded to whole grams — carbs take the remainder because neither source fixes them and they fuel training. Maintenance macros use the same fat/carb split with 1.8 g/kg protein.
 
 Accept imperial units and convert for storage (1 lb = 0.4536 kg, 1 in = 2.54 cm). Sanity-check inputs (age 13–100, weight 35–250 kg, height 130–230 cm, gym 0–14/week) and ask the user to confirm anything outside these ranges.
 
@@ -94,7 +98,7 @@ End the log, remove, summary, and preview workflows with:
 This skill defines no commands — match the user's request to a workflow below.
 
 ### Setup — "set up my diet", "calculate my targets"
-Ask one question at a time: biological sex (needed for the BMR formula), age, weight, height, gym sessions/week. Then compute BMR → maintenance calories → maintenance macros, save the block, show the results, and ask if anything needs fixing. Then ask the goal (fat loss / muscle gain / fat loss + muscle gain / strict maintenance), compute goal targets, save, show them, and again ask if anything needs fixing. If a profile already exists, warn before overwriting.
+Ask one question at a time: biological sex (needed for the BMR formula), age, weight, height, gym sessions/week. Then compute BMR → maintenance calories → maintenance macros, save the block, show the results, and ask if anything needs fixing. Then ask the goal (fat loss / muscle gain / fat loss + muscle gain / strict maintenance), compute goal targets, save, show them, and again ask if anything needs fixing. When presenting maintenance and goal targets, include a one- or two-line citation of the fixed sources from Calculations (e.g., "BMR via Mifflin-St Jeor, the Academy of Nutrition and Dietetics' accuracy pick; protein and calorie adjustments per the ISSN position stands; fat within the IOM 20–35% range") — not a bibliography. If a profile already exists, warn before overwriting.
 
 ### Fix — the user corrects a stat, goal, or target
 Show the current profile values, apply the requested change(s). If any stat or the goal changed, recalculate BMR, maintenance, and targets, save, and show before → after so the user sees what the recalculation changed.
@@ -130,6 +134,7 @@ Answer from general knowledge, using the profile and today's log as context. Nev
 - Reusing a saved dish on a loose match, or reusing one silently — reuse needs solid evidence, and must be mentioned as correctable.
 - Logging or reusing a dish without refreshing its `last_eaten` — stale stamps evict the wrong dish at the 50 cap.
 - Changing weight or goal without recalculating maintenance and targets.
+- Deviating from the pinned equations, constants, or reasoning in Calculations — the method is set in stone — or presenting setup numbers without the brief citation.
 - Logging a dish during a preview — preview never writes.
 - Guessing a portion silently — always state the assumed portion.
 - Asking the user about time, or announcing time inferences while logging — `time` is determined invisibly from wording and context.

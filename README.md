@@ -36,6 +36,8 @@ The skill is conversational — just ask:
 
 ## Method
 
-- BMR via Mifflin-St Jeor, TDEE via gym-frequency activity multipliers
-- Goal adjustments: fat loss −20%, muscle gain +10%, recomp −10%, maintenance ±0
-- Protein anchored to bodyweight (1.8–2.2 g/kg by goal), fat 25% of calories, carbs the remainder
+Targets come from fixed published sources, cited to the user during setup:
+
+- BMR via Mifflin-St Jeor (rated most accurate for healthy adults by the Academy of Nutrition and Dietetics), TDEE via standard activity factors keyed to gym frequency
+- Goal adjustments: fat loss −20%, muscle gain +10%, recomp −10%, maintenance ±0 (per the ISSN position stand on diets and body composition)
+- Protein anchored to bodyweight, 1.8–2.2 g/kg by goal (per the ISSN position stand on protein and exercise); fat 25% of calories (within the IOM 20–35% AMDR); carbs the remainder
