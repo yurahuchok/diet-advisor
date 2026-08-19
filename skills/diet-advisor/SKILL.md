@@ -7,11 +7,11 @@ description: Use when the user wants to track calories or macros, log or preview
 
 Tracks daily food intake against personalized calorie and macro targets calculated from the user's stats and goal.
 
-Built for claude.ai and Claude Desktop chat: there is no filesystem that persists between conversations, so all Diet Advisor data lives in Claude's memory, in one clearly labeled section.
+This skill is platform-agnostic: it runs in any assistant that reads Agent Skills. All data lives in a single portable data block; the Storage section defines where that block is kept depending on what this assistant can do.
 
-## Memory
+## Storage
 
-Keep all Diet Advisor data in a single **Diet Advisor** memory section, structured exactly like this:
+All Diet Advisor data lives in one **DIET ADVISOR DATA** block, structured exactly like this:
 
 ```
 DIET ADVISOR DATA
@@ -29,14 +29,21 @@ history:
   2026-08-16: 2180 kcal / 170 P / 58 F / 240 C (target 2210/176/61/239)
 ```
 
-Rules:
+Where the block lives depends on this assistant's capabilities — pick one mode and stay in it:
 
-- Read this memory section before answering any diet request. If there is no profile, stop and offer to set one up first.
-- After every change (setup, fix, log, remove, new day), update the memory section immediately. Memory is the only store — anything not written there is lost when the conversation ends.
+- **Memory mode** — if you have a persistent memory feature that survives across conversations, keep the block in a single clearly labeled Diet Advisor memory section and update it there.
+- **Data-block mode** — if you have no such feature, or you are not certain writes survive the end of the conversation, treat memory as unavailable. On the first diet request, look for the block earlier in the conversation or ask the user to paste their latest one. After every change, print the full updated block in a code fence and remind the user to save it (pinned note, text file — anywhere they can paste it from next time).
+
+The block is also the migration format: pasted into any other assistant running this skill, it carries all data over.
+
+Rules (both modes):
+
+- Read the current block before answering any diet request. If there is no profile, stop and offer to set one up first.
+- After every change (setup, fix, log, remove, new day), write the updated block immediately — to memory, or printed for the user. The block is the only store; anything not written there is lost when the conversation ends.
 - Use today's date from the conversation context. If the stored `today` date is in the past, first compress that day into a one-line history summary (date + total kcal/P/F/C vs target), then start a fresh `today`.
 - `today` keeps full entries with ids so a single dish can be removed; `history` keeps totals only. Keep at most 14 history lines, dropping the oldest.
 - Day totals for `today` are always computed by summing entries at read time — never stored.
-- Never store diet data outside this section, and never mix general memories into it.
+- Never store diet data outside this block, and never mix unrelated memories into it.
 
 ## Calculations
 
@@ -71,10 +78,10 @@ End the log, remove, summary, and preview workflows with:
 
 ## Workflows
 
-There are no slash commands on claude.ai — match the user's request to a workflow below.
+This skill defines no commands — match the user's request to a workflow below.
 
 ### Setup — "set up my diet", "calculate my targets"
-Ask one question at a time: biological sex (needed for the BMR formula), age, weight, height, gym sessions/week. Then compute BMR → maintenance calories → maintenance macros, save to memory, show the results, and ask if anything needs fixing. Then ask the goal (fat loss / muscle gain / fat loss + muscle gain / strict maintenance), compute goal targets, save, show them, and again ask if anything needs fixing. If a profile already exists in memory, warn before overwriting.
+Ask one question at a time: biological sex (needed for the BMR formula), age, weight, height, gym sessions/week. Then compute BMR → maintenance calories → maintenance macros, save the block, show the results, and ask if anything needs fixing. Then ask the goal (fat loss / muscle gain / fat loss + muscle gain / strict maintenance), compute goal targets, save, show them, and again ask if anything needs fixing. If a profile already exists, warn before overwriting.
 
 ### Fix — the user corrects a stat, goal, or target
 Show the current profile values, apply the requested change(s). If any stat or the goal changed, recalculate BMR, maintenance, and targets, save, and show before → after so the user sees what the recalculation changed.
@@ -83,7 +90,7 @@ Show the current profile values, apply the requested change(s). If any stat or t
 Summarize any previous `today` into history, then create today with empty entries. If today already exists with entries, ask before resetting it. If a dish is mentioned in the same request, immediately run the log workflow on it; otherwise invite the user to log their first dish.
 
 ### Log a dish — "I ate…", "log…", "add…"
-Ensure today exists in memory (create it silently if not). Estimate the dish, append an entry with the next id, save, then show the dish's numbers followed by the status report.
+Ensure today exists in the block (create it silently if not). Estimate the dish, append an entry with the next id, save, then show the dish's numbers followed by the status report.
 
 ### Remove a dish — "remove…", "I didn't eat…"
 Show today's entries with ids if the target is ambiguous; remove the requested entry; save; status report. If the day has no entries, say so.
@@ -95,12 +102,13 @@ Show a table of today's entries (id, dish, kcal/P/F/C), then the status report.
 Estimate the dish and show its numbers but do NOT save anything. Show a hypothetical status report ("If you eat this: …") — what the totals would be and what would remain. End by noting the dish was not logged and offering to log it.
 
 ### Diet question — any other nutrition question
-Answer from general knowledge, using the profile and today's log as context. Never write to memory silently: if the answer implies changing stored data (stats, goal, targets, entries), propose the exact change and ask first. On approval, update, recalculate anything downstream, and show the result.
+Answer from general knowledge, using the profile and today's log as context. Never update the block silently: if the answer implies changing stored data (stats, goal, targets, entries), propose the exact change and ask first. On approval, update, recalculate anything downstream, and show the result.
 
 ## Common mistakes
 
-- Answering from an earlier in-conversation copy of the data instead of the memory section, or changing data without immediately writing memory — memory is the only store.
-- Writing diet data outside the Diet Advisor memory section, or letting general memories leak into it.
+- Answering from a stale in-conversation copy of the data instead of the current block, or changing data without immediately writing it — the block is the only store.
+- In data-block mode, updating data without printing the refreshed block — the user leaves the conversation with stale data.
+- Storing diet data outside the DIET ADVISOR DATA block, or letting unrelated memories leak into it.
 - Storing computed totals for today — always sum entries at read time (history lines are the one exception: totals only).
 - Changing weight or goal without recalculating maintenance and targets.
 - Logging a dish during a preview — preview never writes.

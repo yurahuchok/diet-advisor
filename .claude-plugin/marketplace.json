@@ -7,7 +7,7 @@
     {
       "name": "diet-advisor",
       "source": "./",
-      "description": "Track daily food intake against personalized calorie and macro targets, with data stored in Claude memory. For claude.ai and Claude Desktop chat."
+      "description": "Track daily food intake against personalized calorie and macro targets, kept in a portable data block stored in Claude memory."
     }
   ]
 }
