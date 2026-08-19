@@ -1,0 +1,22 @@
+{
+  "name": "diet-advisor",
+  "version": "1.0.0",
+  "description": "Track daily food intake against personalized calorie and macro targets, kept in a portable data block that moves with you between assistants",
+  "author": {
+    "name": "Yuri Huchok"
+  },
+  "license": "MIT",
+  "keywords": ["diet", "nutrition", "calories", "macros", "tracking"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Diet Advisor",
+    "shortDescription": "Calorie and macro tracking with personalized targets",
+    "longDescription": "Sets up a diet profile from your stats and goal, computes daily calorie and macro targets from published sources (Mifflin-St Jeor, ISSN position stands), then tracks every dish you log against them — with previews, corrections, history, and a reusable dish library. All data lives in one portable data block you can carry between assistants.",
+    "developerName": "Yuri Huchok",
+    "defaultPrompt": [
+      "Use Diet Advisor to set up my diet profile and calculate my daily targets.",
+      "Use Diet Advisor to log a chicken rice bowl for lunch.",
+      "Use Diet Advisor to show how I'm doing on calories and macros today."
+    ]
+  }
+}

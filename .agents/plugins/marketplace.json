@@ -1,0 +1,19 @@
+{
+  "name": "diet-advisor",
+  "interface": {
+    "displayName": "Diet Advisor"
+  },
+  "plugins": [
+    {
+      "name": "diet-advisor",
+      "source": {
+        "source": "local",
+        "path": "./"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_FIRST_USE"
+      }
+    }
+  ]
+}

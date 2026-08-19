@@ -10,13 +10,17 @@ All data lives in a single portable `DIET ADVISOR DATA` block. On assistants wit
 skills/diet-advisor/SKILL.md     # The skill: storage modes, formulas, workflows
 .claude-plugin/plugin.json       # Claude plugin manifest
 .claude-plugin/marketplace.json  # Claude marketplace serving the plugin
+.codex-plugin/plugin.json        # OpenAI (ChatGPT / Codex) plugin manifest
+.agents/plugins/marketplace.json # Repo marketplace serving the plugin to ChatGPT / Codex
 ```
 
 ## Install
 
 **claude.ai / Claude Desktop** (Pro/Max/Team/Enterprise): Customize → Plugins → "+" → Add marketplace from GitHub → this repo's URL → install `diet-advisor`. On the Free plan (no plugin support), zip the `skills/diet-advisor` folder and upload it via Settings → Skills instead (requires code execution enabled).
 
-**ChatGPT**: Plugins → Skills → Create → Upload, choosing the `skills/diet-advisor` folder. Availability depends on plan (GA on managed plans, beta elsewhere), and skills don't sync between devices — install on each one.
+**ChatGPT / Codex (as a plugin)**: clone this repo — its `.agents/plugins/marketplace.json` is a repo marketplace serving the plugin. In ChatGPT desktop, enable developer mode (Settings → Security and login → Developer mode), restart the app, and install `diet-advisor` from the Plugins Directory under the local marketplace source. Or add the marketplace to `~/.agents/plugins/marketplace.json` to make it available everywhere (`source.path` resolves relative to the marketplace root).
+
+**ChatGPT (skill upload only)**: Plugins → Skills → Create → Upload, choosing the `skills/diet-advisor` folder. Availability depends on plan (GA on managed plans, beta elsewhere), and skills don't sync between devices — install on each one.
 
 **Claude Code, Gemini CLI, Codex CLI, and other Agent Skills tools**: copy the `skills/diet-advisor` folder into the tool's skills directory (e.g. `~/.claude/skills/` for Claude Code; see your tool's docs).
 
